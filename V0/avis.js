@@ -27,4 +27,4 @@ client.on('ready', async () => {
   client.destroy();
 });
 
-client.login('OTYyMDUxMjMxOTczNTExMzE4.GeqyJU.3slhVBnzxSb8xcSmobIpMFLlYlzEmiY1X5WBxA'); // Remplace 'token_here' par le token de ton bot Discord
+client.login('TOKEN'); // Remplace 'token_here' par le token de ton bot Discord
