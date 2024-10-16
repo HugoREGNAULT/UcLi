@@ -1,0 +1,37 @@
+/* Ajoute les styles supplémentaires selon tes besoins */
+
+header {
+    position: relative;
+    height: 150px; /* Hauteur du header */
+}
+
+#logo {
+    position: absolute;
+    top: 75px; /* Position Y du logo */
+    left: 351px; /* Position X du logo */
+    width: 66px; /* Largeur du logo */
+    height: 66px; /* Hauteur du logo */
+}
+
+#botName {
+    position: absolute;
+    top: 100px; /* Position Y du nom du bot */
+    left: 412px; /* Position X du nom du bot */
+    width: 68px; /* Largeur du nom du bot */
+    height: 17px; /* Hauteur du nom du bot */
+    font-weight: bold; /* Texte en gras */
+}
+
+#navigation {
+    position: absolute;
+    top: 75px; /* Position Y du menu de navigation */
+    left: 50%; /* Centré en termes de largeur */
+    transform: translateX(-50%); /* Centrage horizontal avec translateX */
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+}
+
+.nav-item {
+    padding: 10px;
+}

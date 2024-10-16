@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoodleBot</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Ajout du lien vers le fichier styles.css -->
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Montserrat.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #fff; /* Blanc pour le fond du corps */
+            color: #333; /* Noir pour le texte du corps */
+        }
+
+        h1 {
+            color: #2c3e50; /* Bleu foncé pour le texte de l'en-tête h1 */
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #7f8c8d; /* Gris pour le texte du paragraphe */
+        }
+
+        /* Styles pour le header */
+        header {
+            position: relative;
+            height: 150px; /* Hauteur du header */
+        }
+
+        #logo {
+            position: absolute;
+            top: 75px; /* Position Y du logo */
+            left: 351px; /* Position X du logo */
+            width: 66px; /* Largeur du logo */
+            height: 66px; /* Hauteur du logo */
+        }
+
+        #botName {
+            position: absolute;
+            top: 141px; /* Position Y du nom du bot */
+            left: 351px; /* Position X du nom du bot (aligné avec le logo) */
+            font-size: 14px; /* Taille de la police pour "NoodleBot" */
+            font-weight: bold; /* Texte en gras */
+        }
+
+        #navigation {
+            position: absolute;
+            top: 75px; /* Position Y du menu de navigation */
+            left: 50%; /* Centré en termes de largeur */
+            transform: translateX(-50%); /* Centrage horizontal avec translateX */
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+        }
+
+        .nav-item {
+            padding: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img id="logo" src="logo.png" alt="Logo NoodleBot">
+        <h1 id="botName">NoodleBot</h1>
+        <div id="navigation">
+            <div class="nav-item">Modules</div>
+            <div class="nav-item">Status</div>
+            <div class="nav-item">Ressources</div>
+            <div class="nav-item">Premium</div>
+        </div>
+    </header>
+
+    <h1>Bienvenue sur NoodleBot</h1>
+    <p>Ceci est un exemple de site utilisant la police d'écriture Montserrat.</p>
+</body>
+</html>
