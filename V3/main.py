@@ -665,7 +665,7 @@ async def userinfo(interaction: discord.Interaction, membre: discord.Member):
     embed.add_field(name = f'''<:IntegrationsChannelsFollowed:1191717286407577670> Informations de {membre.name} sur le Serveur''',
                     value = f'''> » **Rejoint le** : <t:{int(membre.joined_at.timestamp())}:D> (<t:{int(membre.joined_at.timestamp())}:R>)
     > » **Surnom** : `{membre.nick if membre.nick else "Aucun"}`
-    > » **Bot** : {"<:DiscordStatusOnline:1184534287932989460>" if membre.bot else "<:DiscordStatusOffline:1184534286364332102>"}''', inline = False)
+    > » **Bot** : {"<:DiscordStatusOnline:1184534287932989460>" if membre.bot else "<:Danger:1296505953155416132>"}''', inline = False)
 
     embed.add_field(name = f'Rôles (`{len(membre.roles) - 1}`)', value = f'''```{""" ; """.join([role.name for role in membre.roles[1:]]) if len(membre.roles) > 1 else "Aucun"}
 ```''', inline = True)
@@ -1200,7 +1200,7 @@ async def statschannels(interaction: discord.Interaction):
     boosts_id = guild_config.get("sc_numberboost_id")
     status_boosts = f'`❌`' if boosts_id != "❌" else "`❌`"
 
-    status = guild_config.get("statschannel_status", '<:DiscordStatusOffline:1184534286364332102>')
+    status = guild_config.get("statschannel_status", '<:Danger:1296505953155416132>')
 
     embed = discord.Embed(
         title = '\📌 Configuration » \⭐ Salons de Statistiques.',
@@ -1241,7 +1241,7 @@ class StatsChannelsView(discord.ui.View):
 
         if select.values[0] == "toggle":
             # Mettez à jour la valeur de statschannel_status
-            guild_config['statschannel_status'] = '<:DiscordStatusOnline:1184534287932989460>' if guild_config.get('statschannel_status') == '<:DiscordStatusOffline:1184534286364332102>' else '<:DiscordStatusOffline:1184534286364332102>'
+            guild_config['statschannel_status'] = '<:DiscordStatusOnline:1184534287932989460>' if guild_config.get('statschannel_status') == '<:Danger:1296505953155416132>' else '<:Danger:1296505953155416132>'
 
             # Définir role_mention avant utilisation dans l'Embed
             role_id = guild_config.get("soutien_role_id")
@@ -1250,7 +1250,7 @@ class StatsChannelsView(discord.ui.View):
             with open(config_file, 'w') as f:
                 json.dump(config_data, f, indent=2)
 
-            status = guild_config.get('statschannel_status', '<:DiscordStatusOffline:1184534286364332102>')
+            status = guild_config.get('statschannel_status', '<:Danger:1296505953155416132>')
             condition = guild_config.get('soutien_condition', 'non définie')
             embed = discord.Embed(
                 title='\📌 Configuration » \⭐ Biographie de soutien.',
@@ -1438,7 +1438,7 @@ class select_autorole_option(discord.ui.View):
         if select.values[0] == "toggle":
             # Inverse le statut actuel
             current_status = guild_config.get("autorole_status", "❌")
-            new_status = '<:DiscordStatusOnline:1184534287932989460>' if current_status == '<:DiscordStatusOffline:1184534286364332102>' else '<:DiscordStatusOffline:1184534286364332102>'
+            new_status = '<:DiscordStatusOnline:1184534287932989460>' if current_status == '<:Danger:1296505953155416132>' else '<:Danger:1296505953155416132>'
             
             # Met à jour le statut dans le fichier JSON
             config_data[guild_id]['autorole_status'] = new_status
@@ -1616,7 +1616,7 @@ async def soutien(interaction: discord.Interaction):
 
     if guild_id not in config_data:
         config_data[guild_id] = {
-            'soutien_status': '<:DiscordStatusOffline:1184534286364332102>',
+            'soutien_status': '<:Danger:1296505953155416132>',
             'soutien_condition': '`❌`',
             'soutien_role_id': '`❌`'
         }
@@ -1631,7 +1631,7 @@ async def soutien(interaction: discord.Interaction):
 
     embed = discord.Embed(
         title='\📌 Configuration » \⭐ Biographie de soutien.',
-        description=f'''> • **Status** : {guild_config.get('soutien_status', '<:DiscordStatusOffline:1184534286364332102>')}
+        description=f'''> • **Status** : {guild_config.get('soutien_status', '<:Danger:1296505953155416132>')}
                       > • **Condition** : `{guild_config.get('soutien_condition', '`❌`')}`
                       > • **Rôle automatiquement donné** : {role_mention}''',
         color=0x151976)
@@ -1674,7 +1674,7 @@ class modal_soutien(discord.ui.Modal, title="📌 Condition"):
 
         embed = discord.Embed(
             title='\📌 Configuration » \⭐ Biographie de soutien.',
-            description=f'''> • **Status** : {guild_config.get('soutien_status', '<:DiscordStatusOffline:1184534286364332102>')}
+            description=f'''> • **Status** : {guild_config.get('soutien_status', '<:Danger:1296505953155416132>')}
                           > • **Condition** : `{new_condition}`
                           > • **Rôle automatiquement donné** : {role_mention}''',
             color=0X151976)
@@ -1705,7 +1705,7 @@ class modal_role_id(discord.ui.Modal, title="🔧 Configuration du Rôle"):
         guild_config = config_data.get(guild_id, {})
 
         existing_condition = guild_config.get('soutien_condition', '`❌`')
-        existing_status = guild_config.get('soutien_status', '<:DiscordStatusOffline:1184534286364332102>')
+        existing_status = guild_config.get('soutien_status', '<:Danger:1296505953155416132>')
 
         if guild_id not in config_data:
             config_data[guild_id] = {
@@ -1761,7 +1761,7 @@ class select_soutien_option(discord.ui.View):
 
         if select.values[0] == "status":
             status_active = not status_active
-            guild_config['soutien_status'] = '<:DiscordStatusOnline:1184534287932989460>' if status_active else '<:DiscordStatusOffline:1184534286364332102>'
+            guild_config['soutien_status'] = '<:DiscordStatusOnline:1184534287932989460>' if status_active else '<:Danger:1296505953155416132>'
 
             with open(config_file, 'w') as f:
                 json.dump(config_data, f, indent=2)
@@ -1771,7 +1771,7 @@ class select_soutien_option(discord.ui.View):
             condition = guild_config.get('soutien_condition', '\u274c')
             embed = discord.Embed(
                 title='\📌 Configuration » \⭐ Biographie de soutien.',
-                description=f'''> • **Status** : {guild_config.get('soutien_status', '<:DiscordStatusOffline:1184534286364332102>')}
+                description=f'''> • **Status** : {guild_config.get('soutien_status', '<:Danger:1296505953155416132>')}
                               > • **Condition** : `{condition}`
                               > • **Rôle automatiquement donné** : {role_mention}''',
                 color=0X151976)
@@ -1816,10 +1816,8 @@ async def adminlog(interaction: discord.Interaction):
     await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
 
 @tree.command(name='adminconfig', description='Configurer les options administratives du bot.')
-@discord.app_commands.checks.has_role(1183205593381601380)
+@discord.app_commands.checks.has_role(PERM_ADMIN_ID)
 async def admin_config(interaction: discord.Interaction):
-
-    config_file = 'D:\\Discord\\Projets\\NoodleBot\\V2\\Bot\\guildsconfigurations.json'
 
     try:
         with open(config_file, 'r') as f:
@@ -1832,23 +1830,23 @@ async def admin_config(interaction: discord.Interaction):
 
         if guild_id not in config_data:
             config_data[guild_id] = {
-                'security_capchat_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'security_capchat_status': '<:Danger:1296505953155416132>',
                 'security_capchat_channel_id': '`\u274c`',
                 'security_capchat_logschannel_id': '`\u274c`',
                 
-                'ia_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'ia_status': '<:Danger:1296505953155416132>',
                 'ia_channel': '`\u274c`',
                 'ia_logschannel_id': '`\u274c`',
                 
-                'm_welcome_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'm_welcome_status': '<:Danger:1296505953155416132>',
                 'm_welcome_content': '`\u274c`',
                 'm_welcome_channel_id': '`\u274c`',
                 
-                'm_goodbye_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'm_goodbye_status': '<:Danger:1296505953155416132>',
                 'm_goodbye_content': '`\u274c`',
                 'm_goodbye_channel_id': '`\u274c`',
                 
-                'statschannel_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'statschannel_status': '<:Danger:1296505953155416132>',
                 'sc_totalmembers_id': '`\u274c`',
                 'sc_totalmembers_channel_content': '`\u274c`',
                 'sc_membersnotbot_id': '`\u274c`',
@@ -1858,9 +1856,9 @@ async def admin_config(interaction: discord.Interaction):
                 
                 'autorole_logschannel_id': '`\u274c`',
                 'autorole_role': '`\u274c`',
-                'autorole_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'autorole_status': '<:Danger:1296505953155416132>',
                 
-                'soutien_status': '<:DiscordStatusOffline:1184534286364332102>',
+                'soutien_status': '<:Danger:1296505953155416132>',
                 'soutien_condition': '`\u274c`',
                 'soutien_role_id': '`\u274c`',
                 'soutien_permission_warning_sent': False
@@ -1871,8 +1869,71 @@ async def admin_config(interaction: discord.Interaction):
 
     await interaction.response.send_message('Options administratives configurées pour tous les serveurs.', ephemeral=True)
 
+@tree.command(name='adminview', description='Voir les options administratives configurées pour ce serveur.')
+@discord.app_commands.checks.has_role(PERM_ADMIN_ID)
+async def admin_view(interaction: discord.Interaction):
+    try:
+        with open(config_file, 'r') as f:
+            config_data = json.load(f)
+    except FileNotFoundError:
+        await interaction.response.send_message("Le fichier de configuration n'a pas été trouvé.", ephemeral=True)
+        return
+    except json.decoder.JSONDecodeError:
+        await interaction.response.send_message("Erreur lors de la lecture du fichier de configuration.", ephemeral=True)
+        return
+
+    guild_id = str(interaction.guild.id)
+
+    if guild_id not in config_data:
+        await interaction.response.send_message("Aucune configuration trouvée pour ce serveur.", ephemeral=True)
+        return
+
+    guild_config = config_data[guild_id]
+
+    config_message = f"**Configuration pour le serveur {interaction.guild.name}**\n\n"
+    config_message += f"**Sécurité**\n"
+    config_message += f"- Statut CAPTCHA: {guild_config['security_capchat_status']}\n"
+    config_message += f"- Canal CAPTCHA: {guild_config['security_capchat_channel_id']}\n"
+    config_message += f"- Canal Logs CAPTCHA: {guild_config['security_capchat_logschannel_id']}\n\n"
+
+    config_message += f"**Intelligence Artificielle**\n"
+    config_message += f"- Statut IA: {guild_config['ia_status']}\n"
+    config_message += f"- Canal IA: {guild_config['ia_channel']}\n"
+    config_message += f"- Canal Logs IA: {guild_config['ia_logschannel_id']}\n\n"
+
+    config_message += f"**Messages de Bienvenue et d'Adieu**\n"
+    config_message += f"- Statut Bienvenue: {guild_config['m_welcome_status']}\n"
+    config_message += f"- Message de Bienvenue: {guild_config['m_welcome_content']}\n"
+    config_message += f"- Canal Bienvenue: {guild_config['m_welcome_channel_id']}\n"
+    config_message += f"- Statut Adieu: {guild_config['m_goodbye_status']}\n"
+    config_message += f"- Message d'Adieu: {guild_config['m_goodbye_content']}\n"
+    config_message += f"- Canal Adieu: {guild_config['m_goodbye_channel_id']}\n\n"
+
+    config_message += f"**Statistiques du Serveur**\n"
+    config_message += f"- Statut Canal Statistiques: {guild_config['statschannel_status']}\n"
+    config_message += f"- Canal Membres Totaux: {guild_config['sc_totalmembers_id']}\n"
+    config_message += f"- Contenu Membres Totaux: {guild_config['sc_totalmembers_channel_content']}\n"
+    config_message += f"- Canal Membres Non-Bots: {guild_config['sc_membersnotbot_id']}\n"
+    config_message += f"- Contenu Membres Non-Bots: {guild_config['sc_membersnotbot_content']}\n"
+    config_message += f"- Canal Nombre Boost: {guild_config['sc_numberboost_id']}\n"
+    config_message += f"- Contenu Nombre Boost: {guild_config['sc_numberboost_channel_content']}\n\n"
+
+    config_message += f"**Auto-Role**\n"
+    config_message += f"- Canal Logs Auto-Role: {guild_config['autorole_logschannel_id']}\n"
+    config_message += f"- Rôle Auto-Role: {guild_config['autorole_role']}\n"
+    config_message += f"- Statut Auto-Role: {guild_config['autorole_status']}\n\n"
+
+    config_message += f"**Soutien**\n"
+    config_message += f"- Statut Soutien: {guild_config['soutien_status']}\n"
+    config_message += f"- Condition Soutien: {guild_config['soutien_condition']}\n"
+    config_message += f"- Rôle Soutien: {guild_config['soutien_role_id']}\n"
+    config_message += f"- Avertissement Permission Envoyé: {guild_config['soutien_permission_warning_sent']}\n"
+
+    await interaction.response.send_message(config_message, ephemeral=True)
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                                     ADMINISTRATION COMMANDS                                                                            #
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bot.run('TOKEN')
+bot.run('MTAwMTk3MDUyODgzNzQzNTQwMw.GhunCQ.JtHSnlMm5gIZhd5sWLXeMyaGD8CFsRvEI_KAK8')
