@@ -1936,4 +1936,4 @@ async def admin_view(interaction: discord.Interaction):
 #                                                                     ADMINISTRATION COMMANDS                                                                            #
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bot.run('MTAwMTk3MDUyODgzNzQzNTQwMw.GhunCQ.JtHSnlMm5gIZhd5sWLXeMyaGD8CFsRvEI_KAK8')
+bot.run('TOKEN')
