@@ -843,7 +843,7 @@ async def ascii(interaction: discord.Interaction, texte: str):
 
     await interaction.response.send_message(f'''```
 {ascii_art}
-```''', ephemeral = True)
+```''')
 
 @tree.command(name = 'msg', description = 'Envoyer secrêtement un message à quelqu\'un.')
 async def msg(interaction: discord.Interaction, destinataire: discord.Member, message: str):
@@ -975,47 +975,119 @@ async def puissance4(interaction: discord.Interaction, adversaire: discord.Membe
 #                                                                  NOODLESOCIAL & PROFIL COMMANDS                                                                        #
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@tree.command(name = 'like', description = 'Aimer un profil.')
+def load_data():
+    if not os.path.exists("data.json"):
+        with open("data.json", "w") as f:
+            json.dump({}, f)
+    with open("data.json", "r") as f:
+        return json.load(f)
+
+def save_data(data):
+    with open("data.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+# Initialiser les données si elles n'existent pas pour un utilisateur
+def init_user_data(user_id):
+    data = load_data()
+    if str(user_id) not in data:
+        data[str(user_id)] = {
+            "profil": {},
+            "friends": [],
+            "friend_requests": []
+        }
+        save_data(data)
+
+def add_friend(user_id, friend_id):
+    data = load_data()
+    data[str(user_id)]["friends"].append(friend_id)
+    save_data(data)
+
+def add_friend_request(user_id, from_id):
+    data = load_data()
+    data[str(user_id)]["friend_requests"].append(from_id)
+    save_data(data)
+
+def accept_friend_request(user_id, from_id):
+    data = load_data()
+    if from_id in data[str(user_id)]["friend_requests"]:
+        data[str(user_id)]["friend_requests"].remove(from_id)
+        data[str(user_id)]["friends"].append(from_id)
+        data[str(from_id)]["friends"].append(user_id)
+        save_data(data)
+
+@tree.command(name='like', description='Aimer un profil.')
 async def like(interaction: discord.Interaction, profil: discord.Member):
     author_member: discord.Member = interaction.user
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+    await interaction.response.send_message(f'Vous avez aimé le profil de {profil.display_name}.', ephemeral=True)
 
-@tree.command(name = 'friends', description = 'Voir sa liste des amis.')
+@tree.command(name='friends', description='Voir sa liste des amis.')
 async def friends(interaction: discord.Interaction):
     author_member: discord.Member = interaction.user
+    init_user_data(author_member.id)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+    data = load_data()
+    friends_list = data[str(author_member.id)]["friends"]
+    
+    if friends_list:
+        friends_names = ', '.join([f"<@{friend_id}>" for friend_id in friends_list])
+        await interaction.response.send_message(f'Vos amis : {friends_names}.', ephemeral=True)
+    else:
+        await interaction.response.send_message('Vous n\'avez pas encore d\'amis.', ephemeral=True)
 
-@tree.command(name = 'request', description = 'Envoyer une demande d\'amis.')
+@tree.command(name='request', description='Envoyer une demande d\'amis.')
 async def request(interaction: discord.Interaction, profil: discord.Member):
     author_member: discord.Member = interaction.user
+    init_user_data(profil.id)
+    init_user_data(author_member.id)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+    add_friend_request(profil.id, author_member.id)
+    await interaction.response.send_message(f'Vous avez envoyé une demande d\'ami à {profil.display_name}.', ephemeral=True)
 
-@tree.command(name = 'friendsstatus', description = 'Voir les demandes d\'amis reçues.')
+@tree.command(name='friendsstatus', description='Voir les demandes d\'amis reçues.')
 async def friendsstatus(interaction: discord.Interaction):
     author_member: discord.Member = interaction.user
+    init_user_data(author_member.id)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+    data = load_data()
+    requests_list = data[str(author_member.id)]["friend_requests"]
+    
+    if requests_list:
+        requests_names = ', '.join([f"<@{req_id}>" for req_id in requests_list])
+        await interaction.response.send_message(f'Vous avez des demandes d\'amis de : {requests_names}.', ephemeral=True)
+    else:
+        await interaction.response.send_message('Vous n\'avez pas de demandes d\'amis en attente.', ephemeral=True)
 
-@tree.command(name = 'create', description = 'Se créer un profil social.')
+@tree.command(name='create', description='Se créer un profil social.')
 async def create(interaction: discord.Interaction):
     author_member: discord.Member = interaction.user
+    init_user_data(author_member.id)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
+    await interaction.response.send_message(f'Votre profil a été créé avec succès !', ephemeral=True)
 
-@tree.command(name = 'profil', description = 'Voir un profil publique.')
-async def profil(interaction: discord.Interaction):
+@tree.command(name='profil', description='Voir un profil publique.')
+async def profil(interaction: discord.Interaction, profil: discord.Member):
+    init_user_data(profil.id)
+    
+    data = load_data()
+    profil_data = data[str(profil.id)]["profil"]
+    
+    if profil_data:
+        await interaction.response.send_message(f'Profil de {profil.display_name} : {profil_data}.', ephemeral=True)
+    else:
+        await interaction.response.send_message(f'{profil.display_name} n\'a pas encore configuré son profil.', ephemeral=True)
+
+@tree.command(name='profilset', description='Modifier une partie de son profil publique.')
+async def profilset(interaction: discord.Interaction, key: str, value: str):
     author_member: discord.Member = interaction.user
+    init_user_data(author_member.id)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
+    data = load_data()
+    data[str(author_member.id)]["profil"][key] = value
+    save_data(data)
 
-@tree.command(name = 'profilset', description = 'Modifier une partie de son profil publique.')
-async def profilset(interaction: discord.Interaction):
-    author_member: discord.Member = interaction.user
+    await interaction.response.send_message(f'Votre profil a été mis à jour : {key} = {value}.', ephemeral=True)
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                                  NOODLESOCIAL & PROFIL COMMANDS                                                                        #
@@ -1936,4 +2008,4 @@ async def admin_view(interaction: discord.Interaction):
 #                                                                     ADMINISTRATION COMMANDS                                                                            #
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bot.run('TOKEN')
+bot.run('MTAwMTk3MDUyODgzNzQzNTQwMw.G3Uv9I.vfSQ3gE1QkDjedGsC3qRj_Be0b63po19URTFKQ')
