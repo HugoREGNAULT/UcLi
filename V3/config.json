@@ -1,0 +1,42 @@
+{
+    "log_channel_id": 1298665863632650240,
+    "perm_admin_id": 1294748254000386059,
+    "logo_bot": "https://cdn.discordapp.com/attachments/1298665863632650240/1298668230210097163/image-removebg-preview-37.png?ex=671a668a&is=6719150a&hm=1faa5e041b82107bd16f0ca99029505dadbcaf8f8f06e988b4b12a99aec7d5bb&",
+    "nom_monnaie": "KoinCoins",
+    "methodes_gain": {
+        "recompense_quotidienne": {
+            "description": "Gagnez 1000 KoinCoins toutes les 24 heures",
+            "montant": 1000,
+            "cooldown_heures": 24
+        },
+        "vol": {
+            "description": "Volez un autre joueur s'il n'a pas placé son argent à la banque",
+            "chance_reussite": 0.50,
+            "montant_max": 1500000,
+            "cooldown_heures": 0
+        },
+        "recompense_message": {
+            "description": "Gagnez 1 KoinCoins pour chaque message envoyé",
+            "montant_par_message": 1
+        },
+        "blackjack": {
+            "description": "Jouez une partie de blackjack avec 50% de chances de gagner ou de perdre",
+            "chance_gagner": 0.5,
+            "multiplicateur_gagner": 2,
+            "multiplicateur_perdre": 0,
+            "mise_min": 1000,
+            "mise_max": 100000
+        }
+    },
+    "banque": {
+        "taux_interet_base": 0.01,
+        "protection_vol": true,
+        "taux_interet_par_grade": {
+            "Joueur": 0.01,
+            "Premium": 0.03,
+            "VIP": 0.05,
+            "MVP": 0.08,
+            "MVP+": 0.10
+        }
+    }
+}

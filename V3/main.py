@@ -47,8 +47,8 @@ class client(discord.Client):
         print('bio 🟢')
         stats_channels.start()
         print('stats_channels 🟢')
-        appliquer_interets.start()
-        print('appliquer_interets 🟢')
+        #appliquer_interets.start()
+        #print('appliquer_interets 🟢')
 
         global startTime
         startTime = time.time()
@@ -61,7 +61,7 @@ class client(discord.Client):
 -# 🔄 **update_roles_loop** : `UP 🟢`
 -# 📋 **bio** : `UP 🟢`
 -# 📊 **stats_channels** : `UP 🟢`
--# 🎯 **appliquer_interets** : `UP 🟢`
+-# 🎯 **appliquer_interets** : `DOWN 🔴`
 
     Tout est opérationnel !
     """
@@ -1136,29 +1136,6 @@ async def puissance4(interaction: discord.Interaction, adversaire: discord.Membe
 
     view = Puissance4(author_member, adversaire)
     await interaction.response.send_message(f"Partie de Puissance 4 entre {author_member.mention} et {adversaire.mention} !\n\n{view.display_board()}", view=view)
-
-@tree.command(name='leaderboard', description="Afficher le classement des joueurs.")
-async def leaderboard(interaction: discord.Interaction):
-    stats = load_stats()
-
-    if not stats:
-        await interaction.response.send_message("Aucune donnée de joueur trouvée.", ephemeral=True)
-        return
-
-    leaderboard = []
-    for user_id, data in stats.items():
-        user = await interaction.client.fetch_user(int(user_id))
-        ratio = calculate_ratio(data)
-        leaderboard.append((user, ratio, data['wins'], data['losses']))
-
-    leaderboard.sort(key=lambda x: x[1], reverse=True)
-
-    leaderboard_message = "**Leaderboard Puissance 4**\n"
-    for idx, (user, ratio, wins, losses) in enumerate(leaderboard, 1):
-        ratio_display = f"{ratio:.2f}" if ratio != float('inf') else "∞"
-        leaderboard_message += f"{idx}. {user.name} - {wins}W/{losses}L (Ratio: {ratio_display})\n"
-
-    await interaction.response.send_message(leaderboard_message)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                                        MINIS - JEUX COMMANDS                                                                           #
@@ -2389,7 +2366,6 @@ async def withdraw(interaction: discord.Interaction, montant: int):
         await interaction.response.send_message(f"Vous avez retiré {montant} {config['nom_monnaie']} de la banque.")
         await log_message(interaction, f"[ /WITHDRAW ] **{interaction.user.name}** a retiré {montant} {config['nom_monnaie']} de la banque.")
 
-
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -2397,12 +2373,35 @@ async def on_message(message):
     
     user_id = str(message.author.id)
     
+    # Log pour vérifier si le message est bien capté
+    print(f"Message reçu de {message.author.name} ({user_id}): {message.content}")
+
+    # Vérification que l'utilisateur est dans user_data
     if user_id not in user_data:
         user_data[user_id] = {'coins': 0, 'bank': 0, 'grade': 'Joueur'}
+        print(f"Nouvel utilisateur ajouté : {message.author.name}")
+
+    # Log pour vérifier les montants
+    montant_par_message = config['methodes_gain']['recompense_message']['montant_par_message']
+    print(f"Montant par message : {montant_par_message}")
     
-    user_data[user_id]['coins'] += config['methodes_gain']['recompense_message']['montant_par_message']
-    save_data(user_data)
-    await log_message(message, f"{message.author.name} a gagné {config['methodes_gain']['recompense_message']['montant_par_message']} {config['nom_monnaie']} pour avoir envoyé un message.")
+    # Ajout des gains
+    user_data[user_id]['coins'] += montant_par_message
+    print(f"Nouvelle balance pour {message.author.name}: {user_data[user_id]['coins']} {config['nom_monnaie']}")
+    
+    # Essai de sauvegarder les données, log en cas d'erreur
+    try:
+        await save_data(user_data)  # Vérifiez bien que save_data est asynchrone
+        print(f"Données sauvegardées pour {message.author.name}")
+    except Exception as e:
+        print(f"Erreur lors de la sauvegarde des données : {e}")
+
+    # Essai de log le message
+    try:
+        await log_message(message, f"{message.author.name} a gagné {montant_par_message} {config['nom_monnaie']} pour avoir envoyé un message.")
+        print(f"Log envoyé pour {message.author.name}")
+    except Exception as e:
+        print(f"Erreur lors du log : {e}")
 
 fruit_emojis = ['🍎', '🍌', '🍒', '🍇', '🍉', '🍊', '🍋', '🍍', '🥭', '🥝']
 
@@ -2540,11 +2539,9 @@ class Morpion(discord.ui.View):
 
     # Fonction pour afficher le plateau
     def display_board(self):
-        return f"{self.board[0]} | {self.board[1]} | {self.board[2]}\n" \
-               f"---------\n" \
-               f"{self.board[3]} | {self.board[4]} | {self.board[5]}\n" \
-               f"---------\n" \
-               f"{self.board[6]} | {self.board[7]} | {self.board[8]}"
+        return f"{self.board[0]}{self.board[1]}{self.board[2]}\n" \
+               f"{self.board[3]}{self.board[4]}{self.board[5]}\n" \
+               f"{self.board[6]}{self.board[7]}{self.board[8]}"
 
     # Changer de joueur
     def switch_player(self):
@@ -2625,31 +2622,45 @@ async def morpion(interaction: discord.Interaction, adversaire: discord.Member):
     view = Morpion(author_member, adversaire)
     await interaction.response.send_message(f"Partie de Morpion entre {author_member.mention} et {adversaire.mention} !\n\n{view.display_board()}", view=view)
 
-# Commande pour afficher le leaderboard
-@tree.command(name='leaderboard_morpion', description="Afficher le classement des joueurs de Morpion.")
-async def leaderboard_morpion(interaction: discord.Interaction):
-    stats = load_stats()
+def load_json_data(file_path):
+    with open(file_path, 'r') as f:
+        return json.load(f)
 
-    if not stats:
-        await interaction.response.send_message("Aucune donnée de joueur trouvée.", ephemeral=True)
-        return
+data = load_json_data('./data.json')
+morpion_stats = load_json_data('./morpion_stats.json')
+puissance4_stats = load_json_data('./puissance4_stats.json')
 
-    # Calculer les ratios pour chaque joueur
-    leaderboard = []
-    for user_id, data in stats.items():
-        user = await interaction.client.fetch_user(int(user_id))
-        ratio = calculate_ratio(data)
-        leaderboard.append((user, ratio, data['wins'], data['losses']))
-
-    # Trier par ratio (victoires/défaites)
-    leaderboard.sort(key=lambda x: x[1], reverse=True)
-
-    # Générer l'affichage du leaderboard
-    leaderboard_message = "**Leaderboard Morpion**\n"
-    for idx, (user, ratio, wins, losses) in enumerate(leaderboard, 1):
-        ratio_display = f"{ratio:.2f}" if ratio != float('inf') else "∞"
-        leaderboard_message += f"{idx}. {user.name} - {wins}W/{losses}L (Ratio: {ratio_display})\n"
-
+@tree.command(name="leaderboard", description="Affiche différents classements du bot.")
+@app_commands.describe(category="Choisissez une catégorie de leaderboard à afficher")
+@app_commands.choices(
+    category=[
+        app_commands.Choice(name="💰 ・ Classement des Richesses (coins)", value="1"),
+        app_commands.Choice(name="🎯 ・ Morpion (statistiques)", value="2"),
+        app_commands.Choice(name="🟡 ・ Puissance 4 (statistiques)", value="3"),
+    ]
+)
+async def leaderboard(interaction: discord.Interaction, category: app_commands.Choice[str]):
+    if category.value == "1":
+        sorted_data = sorted(data.items(), key=lambda x: x[1]["bank"], reverse=True)
+        leaderboard_message = "**💰 Classement des Richesses (Coins dans la banque) :**\n"
+        for rank, (user_id, stats) in enumerate(sorted_data, start=1):
+            leaderboard_message += f"**{rank}.** <@{user_id}> : {stats['bank']} coins\n"
+    
+    elif category.value == "2":
+        # Afficher le leaderboard pour le Morpion
+        sorted_morpion = sorted(morpion_stats.items(), key=lambda x: x[1]["wins"], reverse=True)
+        leaderboard_message = "**🎯 Classement Morpion (Victoires) :**\n"
+        for rank, (user_id, stats) in enumerate(sorted_morpion, start=1):
+            leaderboard_message += f"**{rank}.** <@{user_id}> : {stats['wins']} victoires, {stats['losses']} défaites\n"
+    
+    elif category.value == "3":
+        # Afficher le leaderboard pour Puissance 4
+        sorted_puissance4 = sorted(puissance4_stats.items(), key=lambda x: x[1]["wins"], reverse=True)
+        leaderboard_message = "**🔵 Classement Puissance 4 (Victoires) :**\n"
+        for rank, (user_id, stats) in enumerate(sorted_puissance4, start=1):
+            leaderboard_message += f"**{rank}.** <@{user_id}> : {stats['wins']} victoires, {stats['losses']} défaites\n"
+    
     await interaction.response.send_message(leaderboard_message)
 
-bot.run('TOKEN')
+
+bot.run('MTAwMTk3MDUyODgzNzQzNTQwMw.G3Uv9I.vfSQ3gE1QkDjedGsC3qRj_Be0b63po19URTFKQ')
