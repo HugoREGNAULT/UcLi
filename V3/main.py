@@ -23,7 +23,7 @@ intents.presences = True
 intents.members = True
 intents.guilds = True
 
-config_file = "/Users/hugo/Desktop/UcLi/V3/guilds-config.json" # ./guilds-config.json
+config_file = "./guilds-config.json" # ./guilds-config.json
 
 
 bot = commands.Bot(command_prefix = '/', intents = intents)
@@ -42,14 +42,32 @@ class client(discord.Client):
             self.synced = True
 
         update_roles_loop.start()
+        print('update_roles_loop 🟢')
         bio.start()
+        print('bio 🟢')
         stats_channels.start()
+        print('stats_channels 🟢')
+        appliquer_interets.start()
+        print('appliquer_interets 🟢')
 
         global startTime
         startTime = time.time()
         france_tz = pytz.timezone('Europe/Paris')
         current_time = datetime.now(france_tz)
         formatted_time = current_time.strftime("%d %B %Y - %Hh%M")
+
+        startup_message = """
+**Bot Démarré avec succès** ✅
+-# 🔄 **update_roles_loop** : `UP 🟢`
+-# 📋 **bio** : `UP 🟢`
+-# 📊 **stats_channels** : `UP 🟢`
+-# 🎯 **appliquer_interets** : `UP 🟢`
+
+    Tout est opérationnel !
+    """
+
+        channel = bot.get_channel(1299049208418144256)
+        await channel.send(startup_message)
 
         print(formatted_time)
         print(f'''
@@ -277,7 +295,7 @@ async def help(interaction: discord.Interaction, page: str):
 
     if page == "5":
 
-        embed = discord.Embed(title = '\🎨 ・ NoodleSocial & Profil',
+        embed = discord.Embed(title = '\🎨 ・ UcLiSocial & Profil',
                               description = f'''» `7` **commandes disponibles**
 • `PERMISSIONS` : Permission que vous devez avoir pour pouvoir utiliser la commande.''',
                               color = 0x151976)
@@ -474,7 +492,7 @@ async def untimeout(interaction: discord.Interaction, membre: discord.Member):
     await membre.timeout(timedelta(seconds = 0))
     await interaction.response.send_message(f'<:Valid:1191522096958939236> {membre.mention} a été rétabli !', ephemeral = True)
 
-data_file = 'D:\\Discord\\Projets\\NoodleBot\\V2\\Bot\\data_infractions.json'
+data_file = './data_infractions.json'
 
 @tree.command(name = 'warn', description = 'Avertir un membre du serveur.')
 @app_commands.default_permissions(moderate_members = True)
@@ -700,7 +718,7 @@ async def botinfo(interaction: discord.Interaction):
     servers_count = len(bot.guilds)
 
     headers = {'Authorization': 'Bearer ptlc_iOulNmU5AHYroZh0fmdE8gZMM0sA7OE2tzZY2ayVZhZ'}
-    response = requests.get("https://panel.berchbrown.me/api/client/servers/b1545927/resources", headers = headers)
+    response = requests.get("https://panel.paladium-bot.fr/api/client/servers/2679a683/resources", headers = headers)
 
     if response.status_code == 200:
             data = response.json()['attributes']["resources"]
@@ -858,11 +876,53 @@ async def avatar(interaction: discord.Interaction, membre: discord.Member):
 
     await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
 
-@tree.command(name = '8ball', description = 'Poser une question à la boule magique.')
+eight_ball_responses = [
+    "Oui, sans aucun doute.",
+    "Non, absolument pas.",
+    "C'est certain.",
+    "Je ne pense pas.",
+    "Demande-moi plus tard.",
+    "Je n'en suis pas si sûr.",
+    "Les signes pointent vers oui.",
+    "Ma réponse est non.",
+    "Il est décidé que oui.",
+    "Réponse floue, réessaye.",
+    "Compte là-dessus.",
+    "Ne compte pas dessus.",
+    "Cela semble prometteur.",
+    "Les perspectives ne sont pas bonnes.",
+    "C'est très probable.",
+    "Je ne peux pas prédire ça maintenant.",
+    "Tu peux compter là-dessus.",
+    "Pas aujourd'hui.",
+    "C'est presque sûr.",
+    "La réponse est en toi.",
+    "Peut-être bien.",
+    "Certainement.",
+    "Les étoiles disent non.",
+    "Il est trop tôt pour le dire.",
+    "Cela semble incertain.",
+    "Oui, mais prépare-toi au pire.",
+    "Non, mais il y a un espoir.",
+    "La chance est de ton côté.",
+    "Je ne sais pas pour l'instant.",
+    "Il y a de fortes chances."
+]
+
+@tree.command(name='8ball', description='Poser une question à la boule magique.')
 async def ball(interaction: discord.Interaction, question: str):
     author_member: discord.Member = interaction.user
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+    response = random.choice(eight_ball_responses)
+    embed = discord.Embed(
+        title="🎱 Boule Magique 8ball 🎱",
+        description=f"**Question** : {question}",
+        color=discord.Color.purple()  # Couleur de l'embed
+    )
+
+    embed.add_field(name="Réponse", value=response, inline=False)
+    embed.set_footer(text=f"Question posée par : {author_member.display_name}", icon_url=author_member.avatar.url if author_member.avatar else None)
+    await interaction.response.send_message(embed=embed)
 
 @tree.command(name = 'rank', description = 'Afficher votre classement, niveau et XP.')
 async def rank(interaction: discord.Interaction, membre: discord.Member = None):
@@ -891,12 +951,6 @@ async def trad(interaction: discord.Interaction, langue_1: str, texte: str, lang
 
 @tree.command(name = 'skip', description = 'Passer à la musique suivante.')
 async def skip(interaction: discord.Interaction):
-    author_member: discord.Member = interaction.user
-
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
-
-@tree.command(name = 'leaderboard', description = 'Montre le classement des 10 + actifs.')
-async def leaderboard(interaction: discord.Interaction):
     author_member: discord.Member = interaction.user
 
     await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
@@ -950,23 +1004,161 @@ async def claim(interaction: discord.Interaction):
 
     await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
 
-@tree.command(name = 'rob', description = 'Voler de l\'argent à quelqu\'un.')
-async def rob(interaction: discord.Interaction, victime: discord.Member):
-    author_member: discord.Member = interaction.user
+# ------------------------------
+# Puissance 4
+# ------------------------------
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True)
+ROWS = 6
+COLUMNS = 7
 
-@tree.command(name = 'morpion', description = 'Jouer au Morpion (Tic Tac Toe).')
-async def morpion(interaction: discord.Interaction, adversaire: discord.Member):
-    author_member: discord.Member = interaction.user
+PLAYER_TOKENS = {
+    '1': '🔴',  # Joueur 1
+    '2': '🟡'   # Joueur 2
+}
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
+STATS_FILE = './puissance4_stats.json'
 
-@tree.command(name = 'puissance4', description = 'Lancer une partie de Puissance 4.')
+def load_stats():
+    if os.path.exists(STATS_FILE):
+        with open(STATS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_stats(stats):
+    with open(STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=4)
+
+def update_stats(winner_id, loser_id):
+    stats = load_stats()
+
+    if winner_id not in stats:
+        stats[winner_id] = {'wins': 0, 'losses': 0}
+    if loser_id not in stats:
+        stats[loser_id] = {'wins': 0, 'losses': 0}
+
+    stats[winner_id]['wins'] += 1
+    stats[loser_id]['losses'] += 1
+
+    save_stats(stats)
+
+def calculate_ratio(stats):
+    wins = stats['wins']
+    losses = stats['losses']
+    if losses == 0:
+        return float('inf') if wins > 0 else 0
+    return wins / losses
+
+class Puissance4(discord.ui.View):
+    def __init__(self, player1, player2):
+        super().__init__(timeout=None)
+        self.player1 = player1
+        self.player2 = player2
+        self.current_player = self.player1
+        self.board = [['⚪' for _ in range(COLUMNS)] for _ in range(ROWS)]
+        self.game_over = False
+
+        for i in range(COLUMNS):
+            self.add_item(ColumnButton(i))
+
+    def display_board(self):
+        return '\n'.join([' '.join(row) for row in self.board])
+
+    def switch_player(self):
+        self.current_player = self.player1 if self.current_player == self.player2 else self.player2
+
+    def insert_token(self, column, token):
+        for row in range(ROWS-1, -1, -1):
+            if self.board[row][column] == '⚪':
+                self.board[row][column] = token
+                return row
+
+    def check_win(self, row, col, token):
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # Droite, Bas, Diagonale /
+        for dr, dc in directions:
+            count = 1
+            for i in range(1, 4):
+                r, c = row + dr * i, col + dc * i
+                if 0 <= r < ROWS and 0 <= c < COLUMNS and self.board[r][c] == token:
+                    count += 1
+                else:
+                    break
+            for i in range(1, 4):
+                r, c = row - dr * i, col - dc * i
+                if 0 <= r < ROWS and 0 <= c < COLUMNS and self.board[r][c] == token:
+                    count += 1
+                else:
+                    break
+            if count >= 4:
+                return True
+        return False
+
+    async def end_game(self, interaction, winner, loser):
+        self.game_over = True
+        self.clear_items()  # Désactiver les boutons
+        update_stats(str(winner.id), str(loser.id))  # Mettre à jour les statistiques
+        await interaction.response.edit_message(content=f'{winner.mention} a gagné la partie !\n\n{self.display_board()}', view=self)
+
+class ColumnButton(discord.ui.Button):
+    def __init__(self, column):
+        super().__init__(label=str(column + 1), style=discord.ButtonStyle.primary, custom_id=str(column))
+        self.column = column
+
+    async def callback(self, interaction: discord.Interaction):
+        view: Puissance4 = self.view
+        if interaction.user != view.current_player:
+            await interaction.response.send_message("Ce n'est pas votre tour.", ephemeral=True)
+            return
+
+        if view.game_over:
+            await interaction.response.send_message("La partie est terminée.", ephemeral=True)
+            return
+
+        token = PLAYER_TOKENS['1'] if view.current_player == view.player1 else PLAYER_TOKENS['2']
+        row = view.insert_token(self.column, token)
+        if row is None:
+            await interaction.response.send_message("Cette colonne est pleine. Choisissez une autre colonne.", ephemeral=True)
+            return
+
+        if view.check_win(row, self.column, token):
+            winner = view.current_player
+            loser = view.player1 if winner == view.player2 else view.player2
+            await view.end_game(interaction, winner, loser)
+        else:
+            view.switch_player()  # Passer au joueur suivant
+            await interaction.response.edit_message(content=f"Tour de {view.current_player.mention} !\n\n{view.display_board()}", view=view)
+
+@tree.command(name='puissance4', description='Lancer une partie de Puissance 4.')
 async def puissance4(interaction: discord.Interaction, adversaire: discord.Member):
     author_member: discord.Member = interaction.user
+    if author_member == adversaire:
+        await interaction.response.send_message("Vous ne pouvez pas jouer contre vous-même.", ephemeral=True)
+        return
 
-    await interaction.response.send_message(f'Commande non disponible.', ephemeral = True) 
+    view = Puissance4(author_member, adversaire)
+    await interaction.response.send_message(f"Partie de Puissance 4 entre {author_member.mention} et {adversaire.mention} !\n\n{view.display_board()}", view=view)
+
+@tree.command(name='leaderboard', description="Afficher le classement des joueurs.")
+async def leaderboard(interaction: discord.Interaction):
+    stats = load_stats()
+
+    if not stats:
+        await interaction.response.send_message("Aucune donnée de joueur trouvée.", ephemeral=True)
+        return
+
+    leaderboard = []
+    for user_id, data in stats.items():
+        user = await interaction.client.fetch_user(int(user_id))
+        ratio = calculate_ratio(data)
+        leaderboard.append((user, ratio, data['wins'], data['losses']))
+
+    leaderboard.sort(key=lambda x: x[1], reverse=True)
+
+    leaderboard_message = "**Leaderboard Puissance 4**\n"
+    for idx, (user, ratio, wins, losses) in enumerate(leaderboard, 1):
+        ratio_display = f"{ratio:.2f}" if ratio != float('inf') else "∞"
+        leaderboard_message += f"{idx}. {user.name} - {wins}W/{losses}L (Ratio: {ratio_display})\n"
+
+    await interaction.response.send_message(leaderboard_message)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                                        MINIS - JEUX COMMANDS                                                                           #
@@ -1261,7 +1453,6 @@ async def statschannels(interaction: discord.Interaction):
         with open(config_file, 'w') as f:
             json.dump(config_data, f, indent=2)
 
-    # Indentez le reste du code pour être dans la portée du `if`
     guild_config = config_data.get(guild_id, {})
     totalmember_id = guild_config.get("sc_totalmembers_id")
     status_option = f'`❌`' if totalmember_id != "❌" else "`❌`"
@@ -1283,7 +1474,6 @@ async def statschannels(interaction: discord.Interaction):
         color = 0X151976)
 
     await interaction.response.send_message(embed=embed, view=StatsChannelsView(), ephemeral=True)
-
 
 class StatsChannelsView(discord.ui.View):
     @discord.ui.select(
@@ -1312,10 +1502,8 @@ class StatsChannelsView(discord.ui.View):
         guild_config = config_data.get(guild_id, {})
 
         if select.values[0] == "toggle":
-            # Mettez à jour la valeur de statschannel_status
             guild_config['statschannel_status'] = '<:DiscordStatusOnline:1184534287932989460>' if guild_config.get('statschannel_status') == '<:Danger:1296505953155416132>' else '<:Danger:1296505953155416132>'
 
-            # Définir role_mention avant utilisation dans l'Embed
             role_id = guild_config.get("soutien_role_id")
             role_mention = f'<@&{role_id}>' if role_id != "`❌`" else "`❌`"
 
@@ -1525,8 +1713,6 @@ class select_autorole_option(discord.ui.View):
         elif select.values[0] == "logs":
             await interaction.response.send_modal(modal_logs_channel())
 
-
-
 class modal_autorole_role(discord.ui.Modal, title="🔧 Configuration du Rôle Autorôle"):
 
     role_id = discord.ui.TextInput(
@@ -1561,7 +1747,6 @@ class modal_autorole_role(discord.ui.Modal, title="🔧 Configuration du Rôle A
                 'autorole_role': 'Role Undefined',
             }
 
-        # Affectez à guild_config la valeur mise à jour après avoir modifié config_data
         guild_config = config_data[guild_id]
 
         config_data[guild_id]['autorole_status'] = existing_status
@@ -1620,7 +1805,6 @@ class modal_logs_channel(discord.ui.Modal, title="📝 Salon de Logs."):
         config_data[guild_id]['autorole_logschannel_id'] = self.logs_channel_id.value
         config_data[guild_id]['autorole_role'] = existing_role
 
-        # Mettez à jour également guild_config pour refléter les modifications
         guild_config = config_data[guild_id]
 
         with open(config_file, 'w') as f:
@@ -1673,7 +1857,6 @@ async def update_roles():
 async def update_roles_loop():
     await bot.wait_until_ready()
     await update_roles()
-
 
 @tree.command(name='soutien', description='Donner un rôle automatiquement en fonction d\'une bio.')
 @commands.has_permissions(administrator=True)
@@ -2008,4 +2191,465 @@ async def admin_view(interaction: discord.Interaction):
 #                                                                     ADMINISTRATION COMMANDS                                                                            #
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bot.run('MTAwMTk3MDUyODgzNzQzNTQwMw.G3Uv9I.vfSQ3gE1QkDjedGsC3qRj_Be0b63po19URTFKQ')
+CONFIG_FILE = "./config.json"
+DATA_FILE = "./data.json"
+
+with open('./config.json', 'r') as f:
+    config = json.load(f)
+
+def load_config():
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+config = load_config()
+LOG_CHANNEL_ID = 1298665863632650240
+
+def format_coins(amount):
+    return f"{amount:,}".replace(",", " ")
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_data(data):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+user_data = load_data()
+
+async def log_message(interaction, message):
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
+    await log_channel.send(f"{message}")
+
+@tree.command(name='coins', description='Voir tous les 🪙 d\'un joueur.')
+async def coins(interaction: discord.Interaction, membre: discord.Member = None):
+    membre = membre or interaction.user
+    user_id = str(membre.id)
+    coins = user_data.get(user_id, {}).get('coins', 0)
+    bank_coins = user_data.get(user_id, {}).get('bank', 0)
+    grade = user_data.get(user_id, {}).get('grade', 'Joueur')
+    taux_interet = config['banque']['taux_interet_par_grade'].get(grade, 0.01)
+
+    montant_apres_interet = bank_coins * (1 + taux_interet)
+    embed = discord.Embed(
+        title=f"Compte de {membre.display_name}",
+        description=f"**Taux d'intérêt** : `{taux_interet*100}%` par jour",
+        color=0xFD8B46)
+    embed.add_field(name="🏦 En banque", value=f"**{format_coins(bank_coins)}** {config['nom_monnaie']}", inline=False)
+    embed.add_field(name="💸 Disponible", value=f"**{format_coins(coins)}** {config['nom_monnaie']}", inline=False)
+    embed.add_field(name="📈 Après Intérêts", value=f"**{format_coins(int(montant_apres_interet))}** {config['nom_monnaie']} (J+1)", inline=False)
+    embed.set_thumbnail(url=membre.avatar.url)
+    embed.set_footer(text=f"Demande par {interaction.user.display_name}")
+
+    await interaction.response.send_message(embed=embed)
+    await log_message(interaction, f"`[ /COINS ]` {membre.name} a consulté ses {config['nom_monnaie']}.")
+
+@tree.command(name='place', description='Commande pour placer des 🪙 à la banque.')
+async def place(interaction: discord.Interaction, montant: int):
+    user_id = str(interaction.user.id)
+    if user_id not in user_data:
+        user_data[user_id] = {'coins': 0, 'bank': 0, 'grade': 'Joueur'}
+
+    if montant > user_data[user_id]['coins']:
+        await interaction.response.send_message("Vous n'avez pas assez de 🪙.")
+    else:
+        user_data[user_id]['coins'] -= montant
+        user_data[user_id]['bank'] += montant
+        save_data(user_data)
+        await interaction.response.send_message(f"Vous avez placé {format_coins(montant)} {config['nom_monnaie']} à la banque.")
+        await log_message(interaction, f"`[ /BANKPLACE ]` {interaction.user.name} a placé `{montant}` {config['nom_monnaie']} à la banque.")
+
+@tree.command(name='daily', description='Recevez une récompense quotidienne.')
+async def daily(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
+    current_time = int(time.time())
+    last_reward = user_data.get(user_id, {}).get('last_daily', 0)
+    cooldown = config['methodes_gain']['recompense_quotidienne']['cooldown_heures'] * 3600
+
+    if current_time - last_reward < cooldown:
+        await interaction.response.send_message("Vous avez déjà réclamé votre récompense quotidienne.")
+        return
+
+    montant = config['methodes_gain']['recompense_quotidienne']['montant']
+    if user_id not in user_data:
+        user_data[user_id] = {'coins': 0, 'bank': 0, 'grade': 'Joueur', 'last_daily': 0}
+
+    user_data[user_id]['coins'] += montant
+    user_data[user_id]['last_daily'] = current_time
+    save_data(user_data)
+
+    await interaction.response.send_message(f"Vous avez reçu {format_coins(montant)} {config['nom_monnaie']} pour votre connexion quotidienne.")
+    await log_message(interaction, f"`[ /DAILY ]` {interaction.user.name} a reçu sa récompense quotidienne.")
+
+@tree.command(name='blackjack', description='Jouez une partie de blackjack.')
+async def blackjack(interaction: discord.Interaction, mise: int):
+    if mise < config['methodes_gain']['blackjack']['mise_min'] or mise > config['methodes_gain']['blackjack']['mise_max']:
+        await interaction.response.send_message(f"La mise doit être entre {config['methodes_gain']['blackjack']['mise_min']} et {config['methodes_gain']['blackjack']['mise_max']}.")
+        return
+
+    user_id = str(interaction.user.id)
+    if user_id not in user_data or user_data[user_id]['coins'] < mise:
+        await interaction.response.send_message("Vous n'avez pas assez de 🪙 pour jouer.")
+        return
+
+    bot_score = random.randint(17, 21)
+    user_score = random.randint(17, 21)
+
+    embed = discord.Embed(title="Résultat de la Partie de Blackjack", color=discord.Color.blue())
+    embed.add_field(name="Mise", value=f"{format_coins(mise)} {config['nom_monnaie']}", inline=False)
+    embed.add_field(name="Score de l'Utilisateur", value=str(user_score), inline=False)
+    embed.add_field(name="Score du Bot", value=str(bot_score), inline=False)
+
+    if user_score > 21:
+        perte = mise
+        user_data[user_id]['coins'] -= perte
+        message = f"Vous avez dépassé 21 avec un score de {user_score}. Vous avez perdu {format_coins(perte)} {config['nom_monnaie']}."
+        embed.add_field(name="Perte", value=f"{format_coins(perte)} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Solde Restant", value=f"{format_coins(user_data[user_id]['coins'])} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Status", value=f"```diff\n- Le 🪙 Win !```", inline=False)
+
+    elif bot_score > 21:
+        gain = mise * config['methodes_gain']['blackjack']['multiplicateur_gagner']
+        user_data[user_id]['coins'] += gain
+        message = f"Le bot a dépassé 21 avec un score de {bot_score}. Vous avez gagné {format_coins(gain)} {config['nom_monnaie']}!"
+        embed.add_field(name="Gain", value=f"{format_coins(gain)} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Solde Actuel", value=f"{format_coins(user_data[user_id]['coins'])} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Status", value=f"```diff\n+ {interaction.user.name} Win !```", inline=False)
+
+    elif user_score > bot_score:
+        gain = mise * config['methodes_gain']['blackjack']['multiplicateur_gagner']
+        user_data[user_id]['coins'] += gain
+        message = f"Vous avez gagné contre le bot ! Votre score est de {user_score} et le score du bot est {bot_score}. Vous avez gagné {format_coins(gain)} {config['nom_monnaie']}!"
+        embed.add_field(name="Gain", value=f"{format_coins(gain)} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Solde Actuel", value=f"{format_coins(user_data[user_id]['coins'])} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Status", value=f"```diff\n+ {interaction.user.name} Win !```", inline=False)
+
+    elif user_score < bot_score:
+        perte = mise
+        user_data[user_id]['coins'] -= perte
+        message = f"Le bot a gagné cette fois-ci avec un score de {bot_score} contre votre score de {user_score}. Vous avez perdu {format_coins(perte)} {config['nom_monnaie']}."
+        embed.add_field(name="Perte", value=f"{format_coins(perte)} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Solde Restant", value=f"{format_coins(user_data[user_id]['coins'])} {config['nom_monnaie']}", inline=False)
+        embed.add_field(name="Status", value=f"```diff\n- Le Kasino a Win !```", inline=False)
+
+    else:
+        message = f"Égalité ! Votre score est de {user_score} et le score du bot est {bot_score}. Vous ne perdez rien."
+        embed.add_field(name="Status", value=f"```diff\n= Égalité !```", inline=False)
+
+    await interaction.response.send_message(message)
+
+    log_channel = interaction.guild.get_channel(1298665863632650240)
+    await log_channel.send(embed=embed)
+
+    save_data(user_data)
+    await log_message(interaction, f"`[ /BLACKJACK ]` {interaction.user.name} a joué au blackjack avec une mise de {format_coins(mise)} {config['nom_monnaie']}. Le bot a obtenu un score de {bot_score} et l'utilisateur a obtenu un score de {user_score}.")
+
+channel_id = 1298665863632650240
+
+@tasks.loop(hours=24)
+async def appliquer_interets():
+    channel = bot.get_channel(1299050389865500734)
+
+    for user_id, data in user_data.items():
+        grade = data.get('grade', 'Joueur')
+        taux_interet = config['banque']['taux_interet_par_grade'].get(grade, 0.01)
+
+        if 'bank' in data:
+            old_balance = data['bank']
+            if old_balance > 0:
+                int_interest = round(old_balance * taux_interet)
+                new_balance = old_balance + int_interest
+                data['bank'] = new_balance
+
+                embed = discord.Embed(title="Intérêts Appliqués", color=0xFD8B46)
+                embed.add_field(name="\🔗 Utilisateur ID", value=f'''```\n{user_id}\n```''', inline=False)
+                embed.add_field(name="\💸 Solde avant intérêts", value=f'''```\n{format_coins(old_balance)}\n```''', inline=False)
+                embed.add_field(name="\🏦 Solde après intérêts", value=f'''```\n{format_coins(new_balance)}\n```''', inline=False)
+
+                await channel.send(embed=embed)
+    save_data(user_data)
+
+@tree.command(name='withdraw', description='Retirer un montant de 🪙 de la banque.')
+async def withdraw(interaction: discord.Interaction, montant: int):
+    user_id = str(interaction.user.id)
+
+    if user_id not in user_data:
+        user_data[user_id] = {'coins': 0, 'bank': 0, 'grade': 'Joueur'}
+    
+    if montant > user_data[user_id]['bank']:
+        await interaction.response.send_message("Vous n'avez pas assez de 🪙 dans votre banque.")
+    else:
+        user_data[user_id]['bank'] -= montant
+        user_data[user_id]['coins'] += montant
+        save_data(user_data)
+        await interaction.response.send_message(f"Vous avez retiré {montant} {config['nom_monnaie']} de la banque.")
+        await log_message(interaction, f"[ /WITHDRAW ] **{interaction.user.name}** a retiré {montant} {config['nom_monnaie']} de la banque.")
+
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    
+    user_id = str(message.author.id)
+    
+    if user_id not in user_data:
+        user_data[user_id] = {'coins': 0, 'bank': 0, 'grade': 'Joueur'}
+    
+    user_data[user_id]['coins'] += config['methodes_gain']['recompense_message']['montant_par_message']
+    save_data(user_data)
+    await log_message(message, f"{message.author.name} a gagné {config['methodes_gain']['recompense_message']['montant_par_message']} {config['nom_monnaie']} pour avoir envoyé un message.")
+
+fruit_emojis = ['🍎', '🍌', '🍒', '🍇', '🍉', '🍊', '🍋', '🍍', '🥭', '🥝']
+
+def generate_combinations():
+    all_combinations = [([fruit] * 3) for fruit in fruit_emojis]
+    num_winning_combinations = int(100 * 0.45)
+    num_non_winning_combinations = 100 - num_winning_combinations
+
+    non_winning_combinations = [
+        [random.choice(fruit_emojis), random.choice(fruit_emojis), random.choice(fruit_emojis)]
+        for _ in range(num_non_winning_combinations)
+    ]
+
+    combinations = all_combinations * int(num_winning_combinations / len(all_combinations)) + non_winning_combinations
+    random.shuffle(combinations)
+
+    return combinations
+
+combinations = generate_combinations()
+
+def spin_roulette():
+    return random.choice(combinations)
+
+def determine_result(spin):
+    return len(set(spin)) == 1
+
+def read_bank_data():
+    with open('./data.json', 'r') as f:
+        return json.load(f)
+
+def write_bank_data(data):
+    with open('./data.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
+@tree.command(name="roulette", description="Jouer à la 🪙 !")
+async def roulette(interaction: discord.Interaction, mise: int):
+    data = read_bank_data()
+    user_id = str(interaction.user.id)
+
+    if user_id not in data:
+        await interaction.response.send_message("Votre compte est introuvable. Veuillez contacter un administrateur.")
+        return
+
+    user_data = data[user_id]
+
+    if mise < 50000:
+        await interaction.response.send_message("La mise minimale est de 50 000.")
+        return
+
+    if user_data['coins'] < mise:
+        await interaction.response.send_message(f"Vous n'avez pas assez d'argent. Votre solde actuel est de {user_data['bank']} coins.")
+        return
+
+    user_data['coins'] -= mise
+
+    spin = spin_roulette()
+    result = determine_result(spin)
+
+    if result:
+        winnings = mise + (mise * 5.5)
+        user_data['coins'] += winnings
+        await interaction.response.send_message(f'🎉 Vous avez gagné ! Voici votre tirage : {" ".join(spin)}. Vous recevez {winnings} coins !')
+    else:
+        await interaction.response.send_message(f'😢 Vous avez perdu ! Voici votre tirage : {" ".join(spin)}. Vous perdez la totalité de votre mise de départ !')
+
+    write_bank_data(data)
+
+
+
+
+
+
+
+
+
+
+PLAYER_TOKENS = {
+    '1': '❌',  # Joueur 1
+    '2': '⭕'   # Joueur 2
+}
+
+# Fichier où les stats seront enregistrées
+STATS_FILE = './morpion_stats.json'
+
+# Charger ou créer un fichier JSON pour les statistiques
+def load_stats():
+    if os.path.exists(STATS_FILE):
+        with open(STATS_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+# Sauvegarder les stats dans le fichier JSON
+def save_stats(stats):
+    with open(STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=4)
+
+# Mettre à jour les statistiques pour un joueur
+def update_stats(winner_id, loser_id):
+    stats = load_stats()
+
+    # Initialiser les stats si nécessaire
+    if winner_id not in stats:
+        stats[winner_id] = {'wins': 0, 'losses': 0}
+    if loser_id not in stats:
+        stats[loser_id] = {'wins': 0, 'losses': 0}
+
+    # Mettre à jour les stats
+    stats[winner_id]['wins'] += 1
+    stats[loser_id]['losses'] += 1
+
+    # Sauvegarder les modifications
+    save_stats(stats)
+
+# Calculer le ratio win/defeat
+def calculate_ratio(stats):
+    wins = stats['wins']
+    losses = stats['losses']
+    if losses == 0:
+        return float('inf') if wins > 0 else 0
+    return wins / losses
+
+# Classe du jeu Morpion
+class Morpion(discord.ui.View):
+    def __init__(self, player1, player2):
+        super().__init__(timeout=None)
+        self.player1 = player1
+        self.player2 = player2
+        self.current_player = self.player1
+        self.board = ['⬜️'] * 9  # Plateau de morpion 3x3
+        self.game_over = False
+
+        # Ajouter des boutons pour chaque case
+        for i in range(9):
+            self.add_item(MorpionButton(i))
+
+    # Fonction pour afficher le plateau
+    def display_board(self):
+        return f"{self.board[0]} | {self.board[1]} | {self.board[2]}\n" \
+               f"---------\n" \
+               f"{self.board[3]} | {self.board[4]} | {self.board[5]}\n" \
+               f"---------\n" \
+               f"{self.board[6]} | {self.board[7]} | {self.board[8]}"
+
+    # Changer de joueur
+    def switch_player(self):
+        self.current_player = self.player1 if self.current_player == self.player2 else self.player2
+
+    # Vérifier si un joueur a gagné
+    def check_win(self, token):
+        win_conditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Lignes
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Colonnes
+            [0, 4, 8], [2, 4, 6]              # Diagonales
+        ]
+        return any(all(self.board[pos] == token for pos in condition) for condition in win_conditions)
+
+    # Vérifier s'il y a égalité
+    def check_draw(self):
+        return all(spot != '⬜️' for spot in self.board)
+
+    # Terminer la partie
+    async def end_game(self, interaction, winner=None):
+        self.game_over = True
+        self.clear_items()  # Désactiver les boutons
+
+        if winner:
+            loser = self.player1 if winner == self.player2 else self.player2
+            update_stats(str(winner.id), str(loser.id))
+            await interaction.response.edit_message(content=f'{winner.mention} a gagné la partie !\n\n{self.display_board()}', view=self)
+        else:
+            await interaction.response.edit_message(content=f'Partie terminée : égalité !\n\n{self.display_board()}', view=self)
+
+# Boutons pour chaque case du Morpion
+class MorpionButton(discord.ui.Button):
+    def __init__(self, position):
+        super().__init__(label='⬜️', style=discord.ButtonStyle.secondary, row=position // 3)
+        self.position = position
+
+    async def callback(self, interaction: discord.Interaction):
+        view: Morpion = self.view
+        if interaction.user != view.current_player:
+            await interaction.response.send_message("Ce n'est pas votre tour.", ephemeral=True)
+            return
+
+        if view.game_over:
+            await interaction.response.send_message("La partie est terminée.", ephemeral=True)
+            return
+
+        # Insérer le jeton dans la case sélectionnée
+        token = PLAYER_TOKENS['1'] if view.current_player == view.player1 else PLAYER_TOKENS['2']
+        if view.board[self.position] != '⬜️':
+            await interaction.response.send_message("Cette case est déjà occupée.", ephemeral=True)
+            return
+
+        view.board[self.position] = token
+        self.label = token
+        self.disabled = True
+
+        # Vérifier si le joueur a gagné
+        if view.check_win(token):
+            await view.end_game(interaction, view.current_player)
+        # Vérifier s'il y a égalité
+        elif view.check_draw():
+            await view.end_game(interaction)
+        else:
+            view.switch_player()  # Passer au joueur suivant
+            await interaction.response.edit_message(content=f"Tour de {view.current_player.mention} !\n\n{view.display_board()}", view=view)
+
+# Commande pour lancer une partie de Morpion
+@tree.command(name='morpion', description='Lancer une partie de Morpion.')
+async def morpion(interaction: discord.Interaction, adversaire: discord.Member):
+    author_member: discord.Member = interaction.user
+
+    # Vérifier que l'auteur et l'adversaire ne sont pas les mêmes
+    if author_member == adversaire:
+        await interaction.response.send_message("Vous ne pouvez pas jouer contre vous-même.", ephemeral=True)
+        return
+
+    # Créer le jeu et envoyer le message initial
+    view = Morpion(author_member, adversaire)
+    await interaction.response.send_message(f"Partie de Morpion entre {author_member.mention} et {adversaire.mention} !\n\n{view.display_board()}", view=view)
+
+# Commande pour afficher le leaderboard
+@tree.command(name='leaderboard_morpion', description="Afficher le classement des joueurs de Morpion.")
+async def leaderboard_morpion(interaction: discord.Interaction):
+    stats = load_stats()
+
+    if not stats:
+        await interaction.response.send_message("Aucune donnée de joueur trouvée.", ephemeral=True)
+        return
+
+    # Calculer les ratios pour chaque joueur
+    leaderboard = []
+    for user_id, data in stats.items():
+        user = await interaction.client.fetch_user(int(user_id))
+        ratio = calculate_ratio(data)
+        leaderboard.append((user, ratio, data['wins'], data['losses']))
+
+    # Trier par ratio (victoires/défaites)
+    leaderboard.sort(key=lambda x: x[1], reverse=True)
+
+    # Générer l'affichage du leaderboard
+    leaderboard_message = "**Leaderboard Morpion**\n"
+    for idx, (user, ratio, wins, losses) in enumerate(leaderboard, 1):
+        ratio_display = f"{ratio:.2f}" if ratio != float('inf') else "∞"
+        leaderboard_message += f"{idx}. {user.name} - {wins}W/{losses}L (Ratio: {ratio_display})\n"
+
+    await interaction.response.send_message(leaderboard_message)
+
+bot.run('TOKEN')
